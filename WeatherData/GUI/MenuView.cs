@@ -1,6 +1,6 @@
 namespace WeatherData;
 
-public class Menu
+public class MenuView
 {
     private enum MenuOption
     {
