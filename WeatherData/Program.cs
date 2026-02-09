@@ -20,5 +20,6 @@ class Program
         // }
         
         await new MenuController().RunAsync();
+        
     }
 }

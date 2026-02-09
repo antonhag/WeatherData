@@ -1,3 +1,5 @@
+using WeatherData.WeatherServices;
+
 namespace WeatherData.Controllers;
 
 public class OutsideController : ControllerBase
@@ -14,7 +16,7 @@ public class OutsideController : ControllerBase
         switch (key)
         {
             case '1':
-                // metod
+                OutsideData.GetTempByDate();
                 return true;
             case '2':
                 // metod
