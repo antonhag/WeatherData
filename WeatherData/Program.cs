@@ -1,14 +1,22 @@
-﻿namespace WeatherData;
+﻿using WeatherData.Files;
+
+namespace WeatherData;
 
 class Program
 {
-    static void Main(string[] args)
+    static async Task Main(string[] args)
     {
         while (true)
         {
             Console.Clear();
             Menu.ShowMenu();
-        
+
+            ReadWriteFiles.ReadAll("Data.txt");
+            Console.WriteLine("Välj ut data"); //?
+            string text = Console.ReadLine();
+            await ReadWriteFiles.WriteRow("Data.txt", text);
+
+
             var key =  Console.ReadKey(true).KeyChar;
 
             switch (key)

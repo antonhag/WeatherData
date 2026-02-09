@@ -74,5 +74,5 @@ public class Menu
             Console.WriteLine(option);
         }
     }
-    
+
 }
