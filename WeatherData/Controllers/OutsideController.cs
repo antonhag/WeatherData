@@ -16,15 +16,16 @@ public class OutsideController : ControllerBase
         switch (key)
         {
             case '1':
-                OutsideData.GetTempByDate();
+                OutsideData.GetAvgTempAndHumidityByDate();
                 return true;
             case '2':
-                OutsideData.AverageTempByDay();
+                OutsideData.GetAverageTempByDay();
                 return true;
             case '3':
-                // metod
+                OutsideData.GetAverageHumidityByDay();
                 return true;
             case '4':
+                OutsideData.GetMoldRisk();
                 return true;
             case '9':
                 return false;

@@ -11,7 +11,7 @@ namespace WeatherData.WeatherServices
         public static string path = "../../../Files/Data.txt";
 
         // Detta är metoden (inte en klass)
-        public static void GetTempByDate()
+        public static void GetAvgTempAndHumidityByDate()
         {
             Console.Write("Skriv in datumet (yyyy-MM-dd): ");
             string dateStr = Console.ReadLine();
@@ -27,7 +27,7 @@ namespace WeatherData.WeatherServices
             var allData = Helpers.ReadDataForDate(path, date);
 
             // Filtrera så vi bara ser "Ute" (Krav i uppgiften) [cite: 24, 25]
-            var outsideData = allData.Where(r => r.Place.Trim() == "Ute").ToList();
+            var outsideData = allData.Where(r => r.Place.Contains("Ute")).ToList();
 
 
             // Räkna ut medel (Krav i uppgiften) [cite: 25, 101]
@@ -41,11 +41,12 @@ namespace WeatherData.WeatherServices
             Console.ReadLine();
         }
 
-        public static void AverageTempByDay()
+        public static void GetAverageTempByDay()
         {
-            // Console.Clear();
+            Console.Clear();
+            Console.WriteLine("Medeltemperatur per dag:\n");
             
-            var allData = Helpers.AverageTempAndHumidityByDay(path);
+            var allData = Helpers.GetWeatherData(path);
             
 
             var sortedByAvgTemp = allData.Where(r => r.Place.Contains("Ute")).GroupBy(r => r.Date.Date).Select(g => new
@@ -53,14 +54,62 @@ namespace WeatherData.WeatherServices
                     Date = g.Key,
                     AvgTemp = g.Average(x => x.Temp),
                 })
-                .OrderBy(x => x.Date).ToList();
+                .OrderByDescending(x => x.AvgTemp).ToList();
 
             foreach (var day in sortedByAvgTemp)
             {
                 Console.WriteLine($"{day.Date:yyyy-MM-dd}: {day.AvgTemp:F2}°C");
             }
 
-            Console.WriteLine("Tryck valfri knapp för att gå tillbaka...");
+            Console.WriteLine("\nTryck valfri knapp för att gå tillbaka...");
+            Console.ReadKey();
+        }
+        
+        public static void GetAverageHumidityByDay()
+        {
+            Console.Clear();
+            Console.WriteLine("Torraste till fuktigaste dagen enligt medelfuktighet per dag:\n");
+            
+            var allData = Helpers.GetWeatherData(path);
+            
+            var sortedByAvgHumidity = allData.Where(r => r.Place.Contains("Ute")).GroupBy(r => r.Date.Date).Select(g => new
+                {
+                    Date = g.Key,
+                    AvgHumidity = g.Average(x => x.Humidity),
+                })
+                .OrderBy(x => x.AvgHumidity).ToList();
+
+            foreach (var day in sortedByAvgHumidity)
+            {
+                Console.WriteLine($"{day.Date:yyyy-MM-dd}: {day.AvgHumidity:F2}%");
+            }
+            
+            Console.WriteLine("\nTryck valfri knapp för att gå tillbaka...");
+            Console.ReadKey();
+        }
+        
+        public static void GetMoldRisk()
+        {
+            var allData = Helpers.GetWeatherData(path);
+            Helpers.GetMoldRiskForAllDays(allData);
+            
+            var sortedByMoldRisk = allData
+                .Where(r => r.Place.Contains("Ute"))         
+                .GroupBy(r => r.Date.Date)                   
+                .Select(g => new
+                {
+                    Date = g.Key,
+                    AvgMoldRisk = g.Average(d => d.MoldRisk) 
+                })
+                .OrderByDescending(x => x.AvgMoldRisk)      
+                .ToList();
+
+            foreach (var day in sortedByMoldRisk)
+            {
+                Console.WriteLine($"{day.Date:yyyy-MM-dd}: {day.AvgMoldRisk:F2}%");
+            }
+            
+            Console.WriteLine("\nTryck valfri knapp för att gå tillbaka...");
             Console.ReadKey();
         }
     }

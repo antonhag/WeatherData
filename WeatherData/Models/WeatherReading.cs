@@ -13,5 +13,6 @@ namespace WeatherData.WeatherServices
         public string Place { get; set; }
         public double Temp { get; set; }
         public double Humidity { get; set; }
+        public double MoldRisk { get; set; }
     }
 }
