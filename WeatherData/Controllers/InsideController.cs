@@ -1,3 +1,5 @@
+using WeatherData.WeatherServices;
+
 namespace WeatherData.Controllers;
 
 public class InsideController : ControllerBase
@@ -14,15 +16,16 @@ public class InsideController : ControllerBase
       switch (key)
       {
          case '1':
-            // metod
+            WeatherAnalysis.PrintAvgTempAndHumidityByDate("Inne");
             return true;
          case '2':
-            // metod
+            WeatherAnalysis.PrintAverageTempByDay("Inne");
             return true;
          case '3':
-            // metod
+            WeatherAnalysis.PrintAverageHumidityByDay("Inne");
             return true;
          case '4':
+            WeatherAnalysis.PrintMoldRisk("Inne");
             return true;
          case '9':
             return false;

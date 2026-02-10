@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace WeatherData.WeatherServices
 {
-    internal class OutsideData
+    internal class WeatherAnalysis
     {
         public static string path = "../../../Files/Data.txt";
 
         // Detta är metoden (inte en klass)
-        public static void GetAvgTempAndHumidityByDate()
+        public static void PrintAvgTempAndHumidityByDate(string place)
         {
             Console.Write("Skriv in datumet (yyyy-MM-dd): ");
             string dateStr = Console.ReadLine();
@@ -27,7 +27,7 @@ namespace WeatherData.WeatherServices
             var allData = Helpers.ReadDataForDate(path, date);
 
             // Filtrera så vi bara ser "Ute" (Krav i uppgiften) [cite: 24, 25]
-            var outsideData = allData.Where(r => r.Place.Contains("Ute")).ToList();
+            var outsideData = allData.Where(r => r.Place.Contains(place)).ToList();
 
 
             // Räkna ut medel (Krav i uppgiften) [cite: 25, 101]
@@ -35,21 +35,25 @@ namespace WeatherData.WeatherServices
             {
                 double avgT = outsideData.Average(r => r.Temp);
                 double avgH = outsideData.Average(r => r.Humidity);
-                Console.WriteLine($"Medeltemp: {avgT:F1}, Luftfuktighet: {avgH:F1}");
+                
+                Console.Clear();
+                Console.WriteLine($"Data för dagen ({(place.Contains("Ute") ? "Utomhus" : "Inomhus")}): {date.ToShortDateString()}");
+                Console.WriteLine($"\tMedeltemp: {avgT:F1}, Luftfuktighet: {avgH:F1}");
             }
 
-            Console.ReadLine();
+            Console.WriteLine("\nTryck valfri knapp för att gå tillbaka...");
+            Console.ReadKey();
         }
 
-        public static void GetAverageTempByDay()
+        public static void PrintAverageTempByDay(string place)
         {
             Console.Clear();
-            Console.WriteLine("Medeltemperatur per dag:\n");
+            Console.WriteLine($"Medeltemperatur per dag ({(place.Contains("Ute") ? "Utomhus" : "Inomhus")}):\n");
             
             var allData = Helpers.GetWeatherData(path);
             
 
-            var sortedByAvgTemp = allData.Where(r => r.Place.Contains("Ute")).GroupBy(r => r.Date.Date).Select(g => new
+            var sortedByAvgTemp = allData.Where(r => r.Place.Contains(place)).GroupBy(r => r.Date.Date).Select(g => new
                 {
                     Date = g.Key,
                     AvgTemp = g.Average(x => x.Temp),
@@ -65,14 +69,14 @@ namespace WeatherData.WeatherServices
             Console.ReadKey();
         }
         
-        public static void GetAverageHumidityByDay()
+        public static void PrintAverageHumidityByDay(string place)
         {
             Console.Clear();
-            Console.WriteLine("Torraste till fuktigaste dagen enligt medelfuktighet per dag:\n");
+            Console.WriteLine($"Torraste till fuktigaste dagen enligt medelfuktighet per dag ({(place.Contains("Ute") ? "Utomhus" : "Inomhus")}):\n");
             
             var allData = Helpers.GetWeatherData(path);
             
-            var sortedByAvgHumidity = allData.Where(r => r.Place.Contains("Ute")).GroupBy(r => r.Date.Date).Select(g => new
+            var sortedByAvgHumidity = allData.Where(r => r.Place.Contains(place)).GroupBy(r => r.Date.Date).Select(g => new
                 {
                     Date = g.Key,
                     AvgHumidity = g.Average(x => x.Humidity),
@@ -88,13 +92,16 @@ namespace WeatherData.WeatherServices
             Console.ReadKey();
         }
         
-        public static void GetMoldRisk()
+        public static void PrintMoldRisk(string place)
         {
+            Console.Clear();
+            Console.WriteLine($"Sortering av dagar från minst till störst risk för mögel ({(place.Contains("Ute") ? "Utomhus" : "Inomhus")}):\n");
+            
             var allData = Helpers.GetWeatherData(path);
             Helpers.GetMoldRiskForAllDays(allData);
             
             var sortedByMoldRisk = allData
-                .Where(r => r.Place.Contains("Ute"))         
+                .Where(r => r.Place.Contains(place))         
                 .GroupBy(r => r.Date.Date)                   
                 .Select(g => new
                 {
