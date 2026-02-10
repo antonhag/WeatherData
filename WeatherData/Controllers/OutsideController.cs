@@ -19,7 +19,7 @@ public class OutsideController : ControllerBase
                 OutsideData.GetTempByDate();
                 return true;
             case '2':
-                // metod
+                OutsideData.AverageTempByDay();
                 return true;
             case '3':
                 // metod
