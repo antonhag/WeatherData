@@ -119,5 +119,51 @@ namespace WeatherData.WeatherServices
             Console.WriteLine("\nTryck valfri knapp för att gå tillbaka...");
             Console.ReadKey();
         }
+        public static void PrintMeteorologicalAutumn(double templimit)
+        {
+            Console.Clear();
+            Console.WriteLine("Analyserar meteorologisk höst (Utomhus)...\n");
+
+            var allData = Helpers.GetWeatherData(path);
+
+            // 2. Skapa dygnsmedelvärden för "Ute"
+            var dailyAverages = allData
+                .Where(r => r.Place.Contains("Ute"))
+                .GroupBy(r => r.Date.Date)
+                .Select(g => new
+                {
+                    Date = g.Key,
+                    AvgTemp = g.Average(x => x.Temp)
+                })
+                .OrderBy(x => x.Date)
+                .ToList();
+
+            DateTime? autumnArrival = null;
+
+            for (int i = 0; i <= dailyAverages.Count - 5; i++)
+            {
+                // Hösten får anlända tidigast 1 augusti
+                if (dailyAverages[i].Date.Month >= 8)
+                {
+                    // Är dygnsmedeltemperaturen under 10.0°C i 5 dygn i följd?
+                    var fiveDayWindow = dailyAverages.Skip(i).Take(5).ToList();
+
+                    if (fiveDayWindow.Count == 5 && fiveDayWindow.All(d => d.AvgTemp < templimit))
+                    {
+                        autumnArrival = dailyAverages[i].Date;
+                        break; 
+                    }
+                }
+            }
+
+            if (autumnArrival.HasValue)
+            {
+                Console.WriteLine($"RESULTAT: Meteorologisk höst anlände den {autumnArrival.Value:yyyy-MM-dd}");
+                Console.WriteLine("Definition: Första dygnet av fem med dygnsmedeltemp < 10°C.");
+            }
+            Console.WriteLine("\nTryck valfri knapp för att gå tillbaka...");
+            Console.ReadKey();
+        }
+
     }
 }

@@ -116,6 +116,7 @@ namespace WeatherData
             return results;
         }
 
+
         public static void GetMoldRiskForAllDays(List<WeatherReading> weatherData)
         {
             foreach (var day in weatherData)
@@ -154,5 +155,6 @@ namespace WeatherData
             // 5. Avrunda till 1 decimal
             return Math.Round(moldRisk, 1);
         }
+
     }
 }
