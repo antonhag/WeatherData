@@ -8,7 +8,7 @@ public class WriteReadController : ControllerBase
     {
         MenuView.ShowWriteMenu();
     }
-
+    // Test
     protected override async Task<bool> HandleInputAsync()
     {
         var key = Console.ReadKey(true).KeyChar;
