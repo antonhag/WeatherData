@@ -2,7 +2,7 @@ using WeatherData.WeatherServices;
 
 namespace WeatherData.Controllers;
 
-public class WriteController : ControllerBase
+public class WriteReadController : ControllerBase
 {
     protected override async Task DrawViewAsync()
     {
@@ -16,16 +16,10 @@ public class WriteController : ControllerBase
         switch (key)
         {
             case '1':
-                await WeatherReportWriter.WriteAvgTempByMonth("WeatherStats.txt");
+                await WeatherReportWriter.WriteReport("WeatherStats.txt");
                 return true;
             case '2':
-                
-                return true;
-            case '3':
-                
-                return true;
-            case '4':
-                
+                WeatherReportReader.ReadReport("WeatherStats.txt");
                 return true;
             case '9':
                 return false;

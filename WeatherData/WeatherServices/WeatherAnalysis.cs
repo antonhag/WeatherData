@@ -119,7 +119,7 @@ namespace WeatherData.WeatherServices
             Console.WriteLine("\nTryck valfri knapp för att gå tillbaka...");
             Console.ReadKey();
         }
-        public static void PrintMeteorologicalSeason(double tempLimit)
+        public static string GetMeteorologicalSeason(double tempLimit)
         {
             Console.Clear();
             Console.WriteLine($"Analyserar meteorologisk {(tempLimit == 10.0 ? "höst" : "vinter")}  (Utomhus)...\n");
@@ -184,24 +184,26 @@ namespace WeatherData.WeatherServices
                 }
             }
 
+            string seasonName = tempLimit == 10.0 ? "höst" : "vinter";
+
+            string result = "";
+            
             if (seasonArrival.HasValue)
             {
-                Console.WriteLine($"RESULTAT: Meteorologisk {(tempLimit == 10.0 ? "höst" : "vinter")} anlände den {seasonArrival.Value:yyyy-MM-dd}");
-                Console.WriteLine($"Definition: Första dygnet av fem dygn med dygnsmedelstemp < {tempLimit}°C.");
+                result += $"\nRESULTAT: Meteorologisk {seasonName} anlände den {seasonArrival.Value:yyyy-MM-dd}\n";
+                result += $"Definition: Första dygnet av fem dygn med dygnsmedelstemp < {tempLimit}°C.\n";
             }
             else if (closestDate.HasValue)
             {
-                Console.WriteLine("Meteorologisk vinter inträffade inte.");
-                Console.WriteLine($"Närmaste period startade {closestDate.Value:yyyy-MM-dd} med 5-dygnsmedel {closestAvg:F1}°C.");
+                result += $"\nMeteorologisk {seasonName} inträffade inte.\n";
+                result += $"Närmaste period startade {closestDate.Value:yyyy-MM-dd} med 5-dygnsmedel {closestAvg:F1}°C.\n";
             }
-            
-            Console.WriteLine("\nTryck valfri knapp för att gå tillbaka...");
-            Console.ReadKey();
+            return result;
         }
 
-        public static List<string>GetAvgTempByMonth()
+        public static List<string>GetAverageByMonth(Func<WeatherReading, double> selector, string valueName)
         {
-            List<string> tempsString = new List<string>();
+            List<string> resultStrings = new List<string>();
 
             var allData = Helpers.GetWeatherData(path);
             
@@ -209,7 +211,7 @@ namespace WeatherData.WeatherServices
 
             foreach (var place in places)
             {
-                tempsString.Add($"\nMedeltemperatur per månad ({place}):\n");
+                resultStrings.Add($"\nMedel{valueName} per månad ({place}):\n");
                 
                 var groupedByMonth = allData
                     .Where(r => r.Place.Contains(place))
@@ -218,17 +220,52 @@ namespace WeatherData.WeatherServices
                     {
                         Year = g.Key.Year,
                         Month = g.Key.Month,
-                        AvgTemp = g.Average(x => x.Temp)
+                        AvgValue = g.Average(selector)
                     })
                     .OrderBy(x => x.Year)
                     .ThenBy(x => x.Month);
 
                 foreach (var month in groupedByMonth)
                 {
-                    tempsString.Add($"{month.Year}-{month.Month:D2}: {month.AvgTemp:F2}°C");
+                    resultStrings.Add($"{month.Year}-{month.Month:D2}: {month.AvgValue:F2} {(valueName == "temperatur" ? "°C" : "%")}");
                 }
             }
-            return tempsString;
+            return resultStrings;
+        }
+
+        public static List<string> GetAverageMoldRiskByMonth()
+        {
+            List<string> resultStrings = new List<string>();
+
+            var allData = Helpers.GetWeatherData(path);
+            
+            Helpers.GetMoldRiskForAllDays(allData);
+
+            string[] places = { "Ute", "Inne" };
+
+            foreach (var place in places)
+            {
+                resultStrings.Add($"\nMedelmögelrisk per månad ({place}):\n");
+
+                var groupedByMonth = allData
+                    .Where(r => r.Place.Contains(place))
+                    .GroupBy(r => new { r.Date.Year, r.Date.Month })
+                    .Select(g => new
+                    {
+                        Year = g.Key.Year,
+                        Month = g.Key.Month,
+                        AvgMoldRisk = g.Average(r => r.MoldRisk)
+                    })
+                    .OrderBy(g => g.Year)
+                    .ThenBy(g => g.Month);
+
+                foreach (var month in groupedByMonth)
+                {
+                    resultStrings.Add($"{month.Year}-{month.Month:D2}: {month.AvgMoldRisk:F2}%");
+                }
+            }
+
+            return resultStrings;
         }
 
     }

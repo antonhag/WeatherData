@@ -6,8 +6,7 @@ public class MenuView
     {
         Utomhus = 1,
         Inomhus = 2,
-        Skriv_till_fil = 3,
-        Läs_från_fil = 4
+        Skriv_eller_läs_från_fil = 3
     }
     
     private enum OutsideInfo
@@ -32,11 +31,8 @@ public class MenuView
 
     private enum WriteInfo
     {
-        Medeltemperatur_ute_och_inne_per_månad = 1,
-        Medelluftfuktighet_ute_och_inne_per_månad = 2,
-        Medelmögelrisk_ute_och_inne_per_månad = 3,
-        Datum_för_höst_och_vinter_2016 = 4,
-        Algoritmen_för_mögel = 5,
+        Skriv_data_till_fil = 1,
+        Läs_data_från_fil = 2,
         Återgå_till_menyn = 9
     }
 

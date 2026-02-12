@@ -20,7 +20,7 @@ public class MenuController : ControllerBase
                 await new InsideController().RunAsync();
                 return true;
             case '3':
-                await new WriteController().RunAsync();
+                await new WriteReadController().RunAsync();
                 return true;
             default:
                 ShowError("Ogiltigt val!");

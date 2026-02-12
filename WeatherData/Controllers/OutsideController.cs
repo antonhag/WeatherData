@@ -28,10 +28,14 @@ public class OutsideController : ControllerBase
                 WeatherAnalysis.PrintMoldRisk("Ute");
                 return true;
             case '5':
-                WeatherAnalysis.PrintMeteorologicalSeason(10.0);
+                Console.WriteLine(WeatherAnalysis.GetMeteorologicalSeason(10.0));
+                Console.WriteLine("\nTryck valfri knapp för att gå tillbaka...");
+                Console.ReadKey();
                 return true;
             case '6':
-                WeatherAnalysis.PrintMeteorologicalSeason(0.0);
+                Console.WriteLine(WeatherAnalysis.GetMeteorologicalSeason(0.0));
+                Console.WriteLine("\nTryck valfri knapp för att gå tillbaka...");
+                Console.ReadKey();
                 return true;
             case '9':
                 return false;
