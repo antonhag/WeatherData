@@ -5,7 +5,9 @@ public class MenuView
     private enum MenuOption
     {
         Utomhus = 1,
-        Inomhus = 2
+        Inomhus = 2,
+        Skriv_till_fil = 3,
+        Läs_från_fil = 4
     }
     
     private enum OutsideInfo
@@ -28,15 +30,24 @@ public class MenuView
         Återgå_till_menyn = 9
     }
 
+    private enum WriteInfo
+    {
+        Medeltemperatur_ute_och_inne_per_månad = 1,
+        Medelluftfuktighet_ute_och_inne_per_månad = 2,
+        Medelmögelrisk_ute_och_inne_per_månad = 3,
+        Datum_för_höst_och_vinter_2016 = 4,
+        Algoritmen_för_mögel = 5,
+        Återgå_till_menyn = 9
+    }
+
     public static void ShowMenu()
     {
         var options = new List<string>();
-        
+
         foreach (int i in Enum.GetValues(typeof(MenuOption)))
         {
             options.Add($"{i}. {Enum.GetName(typeof(MenuOption), i).Replace("_", " ")}");
         }
-
 
         Console.WriteLine("Välj vad du vill få info om\n");
         foreach (var option in options)
@@ -48,12 +59,12 @@ public class MenuView
     public static void ShowOutsideMenu()
     {
         var options = new List<string>();
-        
+
         foreach (int i in Enum.GetValues(typeof(OutsideInfo)))
         {
             options.Add($"{i}. {Enum.GetName(typeof(OutsideInfo), i).Replace("_", " ")}");
         }
-        
+
         foreach (var option in options)
         {
             Console.WriteLine(option);
@@ -63,7 +74,7 @@ public class MenuView
     public static void ShowInsideMenu()
     {
         var options = new List<string>();
-        
+
         foreach (int i in Enum.GetValues(typeof(InsideInfo)))
         {
             options.Add($"{i}. {Enum.GetName(typeof(InsideInfo), i).Replace("_", " ")}");
@@ -75,4 +86,18 @@ public class MenuView
         }
     }
 
+    public static void ShowWriteMenu()
+    {
+        var options = new List<string>();
+
+        foreach (int i in Enum.GetValues(typeof(WriteInfo)))
+        {
+            options.Add($"{i}. {Enum.GetName(typeof(WriteInfo), i).Replace("_", " ")}");
+        }
+
+        foreach (var option in options)
+        {
+            Console.WriteLine(option);
+        }
+    }
 }

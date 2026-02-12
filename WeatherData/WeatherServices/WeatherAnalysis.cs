@@ -119,10 +119,10 @@ namespace WeatherData.WeatherServices
             Console.WriteLine("\nTryck valfri knapp för att gå tillbaka...");
             Console.ReadKey();
         }
-        public static void PrintMeteorologicalAutumn(double templimit)
+        public static void PrintMeteorologicalSeason(double tempLimit)
         {
             Console.Clear();
-            Console.WriteLine("Analyserar meteorologisk höst (Utomhus)...\n");
+            Console.WriteLine($"Analyserar meteorologisk {(tempLimit == 10.0 ? "höst" : "vinter")}  (Utomhus)...\n");
 
             var allData = Helpers.GetWeatherData(path);
 
@@ -138,31 +138,97 @@ namespace WeatherData.WeatherServices
                 .OrderBy(x => x.Date)
                 .ToList();
 
-            DateTime? autumnArrival = null;
-
+            DateTime? seasonArrival = null;
+            double? closestAvg = null;
+            DateTime? closestDate = null;
+            
             for (int i = 0; i <= dailyAverages.Count - 5; i++)
             {
+                
                 // Hösten får anlända tidigast 1 augusti
                 if (dailyAverages[i].Date.Month >= 8)
                 {
-                    // Är dygnsmedeltemperaturen under 10.0°C i 5 dygn i följd?
+                    // Är dygnsmedeltemperaturen under tempLimit i 5 dygn i följd?
                     var fiveDayWindow = dailyAverages.Skip(i).Take(5).ToList();
 
-                    if (fiveDayWindow.Count == 5 && fiveDayWindow.All(d => d.AvgTemp < templimit))
+                    bool coherent = true;
+                    
+                    // kontrollerar ifall varje datum är exakt 1 dag efter föregående (så att den inte räknar med hål i datumen)
+                    for (int j = 1; j < fiveDayWindow.Count; j++)
                     {
-                        autumnArrival = dailyAverages[i].Date;
-                        break; 
+                        if ((fiveDayWindow[j].Date - fiveDayWindow[j - 1].Date).Days != 1)
+                        {
+                            coherent = false;
+                            break;
+                        }
+
                     }
+                    
+                    if (fiveDayWindow.Count == 5 && coherent && fiveDayWindow.All(d => d.AvgTemp <= tempLimit))
+                    {
+                        seasonArrival = dailyAverages[i].Date;
+                        break;
+                    }
+
+                    if (fiveDayWindow.Count == 5 && coherent)
+                    {
+                        double windowAvg = fiveDayWindow.Average(d => d.AvgTemp);
+                        
+                        if (closestAvg == null || windowAvg < closestAvg)
+                        {
+                            closestAvg = windowAvg;
+                            closestDate = dailyAverages[i].Date;
+                        }
+                    }
+
                 }
             }
 
-            if (autumnArrival.HasValue)
+            if (seasonArrival.HasValue)
             {
-                Console.WriteLine($"RESULTAT: Meteorologisk höst anlände den {autumnArrival.Value:yyyy-MM-dd}");
-                Console.WriteLine("Definition: Första dygnet av fem med dygnsmedeltemp < 10°C.");
+                Console.WriteLine($"RESULTAT: Meteorologisk {(tempLimit == 10.0 ? "höst" : "vinter")} anlände den {seasonArrival.Value:yyyy-MM-dd}");
+                Console.WriteLine($"Definition: Första dygnet av fem dygn med dygnsmedelstemp < {tempLimit}°C.");
             }
+            else if (closestDate.HasValue)
+            {
+                Console.WriteLine("Meteorologisk vinter inträffade inte.");
+                Console.WriteLine($"Närmaste period startade {closestDate.Value:yyyy-MM-dd} med 5-dygnsmedel {closestAvg:F1}°C.");
+            }
+            
             Console.WriteLine("\nTryck valfri knapp för att gå tillbaka...");
             Console.ReadKey();
+        }
+
+        public static List<string>GetAvgTempByMonth()
+        {
+            List<string> tempsString = new List<string>();
+
+            var allData = Helpers.GetWeatherData(path);
+            
+            string[] places = { "Ute", "Inne" };
+
+            foreach (var place in places)
+            {
+                tempsString.Add($"\nMedeltemperatur per månad ({place}):\n");
+                
+                var groupedByMonth = allData
+                    .Where(r => r.Place.Contains(place))
+                    .GroupBy(r => new { r.Date.Year, r.Date.Month })
+                    .Select(g => new
+                    {
+                        Year = g.Key.Year,
+                        Month = g.Key.Month,
+                        AvgTemp = g.Average(x => x.Temp)
+                    })
+                    .OrderBy(x => x.Year)
+                    .ThenBy(x => x.Month);
+
+                foreach (var month in groupedByMonth)
+                {
+                    tempsString.Add($"{month.Year}-{month.Month:D2}: {month.AvgTemp:F2}°C");
+                }
+            }
+            return tempsString;
         }
 
     }

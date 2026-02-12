@@ -28,7 +28,10 @@ public class OutsideController : ControllerBase
                 WeatherAnalysis.PrintMoldRisk("Ute");
                 return true;
             case '5':
-                WeatherAnalysis.PrintMeteorologicalAutumn();
+                WeatherAnalysis.PrintMeteorologicalSeason(10.0);
+                return true;
+            case '6':
+                WeatherAnalysis.PrintMeteorologicalSeason(0.0);
                 return true;
             case '9':
                 return false;

@@ -125,7 +125,7 @@ namespace WeatherData
             }
         }
 
-        public static double CalculateMoldRisk(double temp, double humidity)
+        private static double CalculateMoldRisk(double temp, double humidity)
         {
             // 1. Minimala krav för mögel: temperatur 0–50°C och fukt ≥ 60%
             if (temp <= 0 || temp >= 50 || humidity < 60)
