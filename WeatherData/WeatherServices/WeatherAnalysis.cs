@@ -9,28 +9,24 @@ namespace WeatherData.WeatherServices
     internal class WeatherAnalysis
     {
         public static string path = "../../../Files/Data.txt";
-
-        // Detta är metoden (inte en klass)
+        
         public static void PrintAvgTempAndHumidityByDate(string place)
         {
             Console.Write("Skriv in datumet (yyyy-MM-dd): ");
             string dateStr = Console.ReadLine();
 
-            // 1. Validering (Krav i uppgiften) [cite: 25]
+            
             if (!DateTime.TryParse(dateStr, out DateTime date))
             {
                 Console.WriteLine("Felaktigt format.");
                 return;
             }
-
-            // Hämta datan med hjälp av din Helper
-            var allData = Helpers.ReadDataForDate(path, date);
-
-            // Filtrera så vi bara ser "Ute" (Krav i uppgiften) [cite: 24, 25]
+            
+            var allData = Helpers.GetWeatherDataFromDate(path, date);
+            
             var outsideData = allData.Where(r => r.Place.Contains(place)).ToList();
 
-
-            // Räkna ut medel (Krav i uppgiften) [cite: 25, 101]
+            
             if (outsideData.Any())
             {
                 double avgT = outsideData.Average(r => r.Temp);
@@ -119,6 +115,7 @@ namespace WeatherData.WeatherServices
             Console.WriteLine("\nTryck valfri knapp för att gå tillbaka...");
             Console.ReadKey();
         }
+        
         public static string GetMeteorologicalSeason(double tempLimit)
         {
             Console.Clear();
@@ -126,7 +123,7 @@ namespace WeatherData.WeatherServices
 
             var allData = Helpers.GetWeatherData(path);
 
-            // 2. Skapa dygnsmedelvärden för "Ute"
+            // Skapa dygnsmedelvärden för "Ute"
             var dailyAverages = allData
                 .Where(r => r.Place.Contains("Ute"))
                 .GroupBy(r => r.Date.Date)
@@ -142,6 +139,7 @@ namespace WeatherData.WeatherServices
             double? closestAvg = null;
             DateTime? closestDate = null;
             
+            
             for (int i = 0; i <= dailyAverages.Count - 5; i++)
             {
                 
@@ -149,7 +147,8 @@ namespace WeatherData.WeatherServices
                 if (dailyAverages[i].Date.Month >= 8)
                 {
                     // Är dygnsmedeltemperaturen under tempLimit i 5 dygn i följd?
-                    var fiveDayWindow = dailyAverages.Skip(i).Take(5).ToList();
+                    
+                    var fiveDayWindow = dailyAverages.Skip(i).Take(5).ToList(); // Skip(i) hoppar över de första i elementen och börjar fönstret vid index i
 
                     bool coherent = true;
                     
@@ -201,7 +200,7 @@ namespace WeatherData.WeatherServices
             return result;
         }
 
-        public static List<string>GetAverageByMonth(Func<WeatherReading, double> selector, string valueName)
+        public static List<string>GetAverageByMonth(Func<DailyWeatherReading, double> selector, string valueName)
         {
             List<string> resultStrings = new List<string>();
 

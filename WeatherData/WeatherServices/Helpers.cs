@@ -16,9 +16,9 @@ namespace WeatherData
         );
 
 
-        public static List<WeatherReading> ReadDataForDate(string path, DateTime inputDate)
+        public static List<DailyWeatherReading> GetWeatherDataFromDate(string path, DateTime inputDate)
         {
-            var results = new List<WeatherReading>();
+            var results = new List<DailyWeatherReading>();
             var dateStr = inputDate.ToString("yyyy-MM-dd");
 
             try
@@ -35,19 +35,21 @@ namespace WeatherData
                             continue;
                         }
 
+                        // Tolkar datumsträngen exakt enligt formatet "yyyy-MM-dd" med InvariantCulture,
+                        // så att resultatet blir samma oavsett datorns språk-/regionsinställningar 
                         var date = DateTime.ParseExact(match.Groups["date"].Value, "yyyy-MM-dd",
                             CultureInfo.InvariantCulture);
-                        var temp = double.Parse(match.Groups["temp"].Value, CultureInfo.InvariantCulture);
+                        var temp = double.Parse(match.Groups["temp"].Value, CultureInfo.InvariantCulture); 
                         var humidity = double.Parse(match.Groups["humidity"].Value, CultureInfo.InvariantCulture);
                         var place = match.Groups["place"].Value.Trim();
 
-                        if ((date.Year == 2016 && date.Month == 5 || date.Year == 2017 && date.Month == 1))
+                        if ((date.Year == 2016 && date.Month == 5 || date.Year == 2017 && date.Month == 1)) // Hoppar över månader 5 och 12 som ej skulle vara med enligt uppgiften
                         {
                             continue;
                         }
 
-                        // 3. Skapa objektet och lägg till i listan
-                        results.Add(new WeatherReading
+                        // Skapa objektet och lägg till i listan
+                        results.Add(new DailyWeatherReading
                         {
                             Date = date,
                             Place = place,
@@ -65,11 +67,10 @@ namespace WeatherData
             return results;
         }
 
-        public static List<WeatherReading> GetWeatherData(string path)
+        public static List<DailyWeatherReading> GetWeatherData(string path)
         {
-            var results = new List<WeatherReading>();
-
-
+            var results = new List<DailyWeatherReading>();
+            
             using (StreamReader reader = new StreamReader(path))
             {
                 string line;
@@ -85,7 +86,8 @@ namespace WeatherData
                             continue;
                         }
 
-
+                        // Tolkar datumsträngen exakt enligt formatet "yyyy-MM-dd" med InvariantCulture,
+                        // så att resultatet blir samma oavsett datorns språk-/regionsinställningar
                         var date = DateTime.ParseExact(match.Groups["date"].Value, "yyyy-MM-dd",
                             CultureInfo.InvariantCulture);
                         var temp = double.Parse(match.Groups["temp"].Value, CultureInfo.InvariantCulture);
@@ -97,7 +99,7 @@ namespace WeatherData
                             continue;
                         }
 
-                        results.Add(new WeatherReading
+                        results.Add(new DailyWeatherReading
                         {
                             Date = date,
                             Place = place,
@@ -117,7 +119,7 @@ namespace WeatherData
         }
 
 
-        public static void GetMoldRiskForAllDays(List<WeatherReading> weatherData)
+        public static void GetMoldRiskForAllDays(List<DailyWeatherReading> weatherData)
         {
             foreach (var day in weatherData)
             {
@@ -127,33 +129,47 @@ namespace WeatherData
 
         private static double CalculateMoldRisk(double temp, double humidity)
         {
-            // 1. Minimala krav för mögel: temperatur 0–50°C och fukt ≥ 60%
-            if (temp <= 0 || temp >= 50 || humidity < 60)
+            // krav för mögel
+            if (temp <= 0 || temp >= 50 || humidity < 70)
+            {
                 return 0;
+            }
 
-            // 2. Risk baserat på fuktighet (linjär mellan 60% och 100%)
-            double humidityRisk = ((humidity - 60) / (100 - 60)) * 100; // 0–100%
+            double humidityRisk = ((humidity - 70) / (100 - 70)) * 100;
 
-            // 3. Risk baserat på temperatur (optimal mellan 20–30°C)
+            // Risk baserat på temperatur
             double tempRisk;
             if (temp >= 20 && temp <= 30)
             {
-                tempRisk = 100; // optimal temperatur → full risk
+                tempRisk = 100; // optimal temperatur = full risk
             }
             else if (temp < 20)
             {
                 tempRisk = Math.Max(0, (temp / 20) * 100); // minskar linjärt mot 0°C
             }
-            else // temp > 30
+            else
             {
                 tempRisk = Math.Max(0, ((50 - temp) / (50 - 30)) * 100); // minskar linjärt mot 50°C
             }
 
-            // 4. Kombinera risker med vikt: fukt 70%, temp 30%
+            // Kombinera risker med vikt: fukt 70%, temp 30%
             double moldRisk = humidityRisk * 0.7 + tempRisk * 0.3;
 
-            // 5. Avrunda till 1 decimal
+            // Avrunda till 1 decimal
             return Math.Round(moldRisk, 1);
+        }
+
+        public static string MoldRiskFormula()
+        {
+            string moldRisk = "-------Mögelrisk algoritmen-------";
+
+            moldRisk += "\n\nKrav för mögel: 0°C < T < 50°C och H ≥ 70% (annars 0% risk)";
+
+            moldRisk += "\n\nMögelrisk (%) = 0,7 × ((H - 70) / 30 × 100) + 0,3 × Temperaturrisk";
+
+            moldRisk += "\n\nTemperaturrisk\n\n100% om 20°C ≤ T ≤ 30°C\n(T / 20 × 100) om T < 20\n((50 - T) / 20 × 100) om T > 30";
+
+            return moldRisk;
         }
 
     }

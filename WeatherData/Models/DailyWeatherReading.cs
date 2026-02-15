@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace WeatherData.WeatherServices
 {
-    internal class WeatherReading
+    internal class DailyWeatherReading
     {
         public DateTime Date { get; set; }
         public string Place { get; set; }

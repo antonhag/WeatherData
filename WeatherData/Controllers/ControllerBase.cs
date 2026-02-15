@@ -17,7 +17,6 @@ public abstract class ControllerBase
             catch (Exception ex)
             {
                 Console.Clear();
-                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("Ett fel inträffade: ");
                 Console.WriteLine(ex.Message);
                 if (ex.InnerException != null)
@@ -37,7 +36,6 @@ public abstract class ControllerBase
     protected virtual void ShowError(string message)
     {
         Console.Clear();
-        Console.ForegroundColor = ConsoleColor.Red;
         Console.WriteLine(message);
         Console.WriteLine("\nTryck valfri knapp för att fortsätta...");
         Console.ReadKey(true);

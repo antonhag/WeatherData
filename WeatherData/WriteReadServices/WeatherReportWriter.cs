@@ -14,6 +14,7 @@ public class WeatherReportWriter
         
         string autumn = WeatherAnalysis.GetMeteorologicalSeason(10.0);
         string winter = WeatherAnalysis.GetMeteorologicalSeason(0.0);
+        string moldRiskFormula = Helpers.MoldRiskFormula();
 
         using (StreamWriter writer = new StreamWriter(path + fileName))
         {
@@ -34,7 +35,12 @@ public class WeatherReportWriter
 
             await writer.WriteLineAsync(autumn);
             await writer.WriteLineAsync(winter);
+            await writer.WriteLineAsync(moldRiskFormula);
         }
+        
+        Console.Clear();
+        Console.WriteLine("Filen har skapats! Tryck valfri knapp för att gå tillbaka...");
+        Console.ReadKey();
     }
     
 }
