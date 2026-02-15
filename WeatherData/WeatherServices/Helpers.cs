@@ -127,19 +127,18 @@ namespace WeatherData
 
         private static double CalculateMoldRisk(double temp, double humidity)
         {
-            // 1. Minimala krav för mögel: temperatur 0–50°C och fukt ≥ 60%
-            if (temp <= 0 || temp >= 50 || humidity < 60)
+            // krav för mögel
+            if (temp <= 0 || temp >= 50 || humidity < 75)
                 return 0;
 
-            // 2. Risk baserat på fuktighet (linjär mellan 60% och 100%)
-            double humidityRisk = ((humidity - 60) / (100 - 60)) * 100; // 0–100%
+            double humidityRisk = ((humidity - 75) / (100 - 75)) * 100; // 0–100%
 
             // 3. Risk baserat på temperatur (optimal mellan 20–30°C)
             double tempRisk;
             if (temp >= 20 && temp <= 30)
             {
                 tempRisk = 100; // optimal temperatur → full risk
-            }
+            }                                                                                                       
             else if (temp < 20)
             {
                 tempRisk = Math.Max(0, (temp / 20) * 100); // minskar linjärt mot 0°C
