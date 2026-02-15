@@ -130,18 +130,16 @@ namespace WeatherData
         private static double CalculateMoldRisk(double temp, double humidity)
         {
             // krav för mögel
-            if (temp <= 0 || temp >= 50 || humidity < 70)
-            {
-                return 0;
-            }
+            if (temp <= 0 || temp >= 50 || humidity < 75)
+            return 0;
 
-            double humidityRisk = ((humidity - 70) / (100 - 70)) * 100;
+            double humidityRisk = ((humidity - 75) / (100 - 75)) * 100;
 
             // Risk baserat på temperatur
             double tempRisk;
             if (temp >= 20 && temp <= 30)
             {
-                tempRisk = 100; // optimal temperatur = full risk
+                tempRisk = 100; // optimal temperatur → full risk
             }
             else if (temp < 20)
             {
@@ -152,10 +150,10 @@ namespace WeatherData
                 tempRisk = Math.Max(0, ((50 - temp) / (50 - 30)) * 100); // minskar linjärt mot 50°C
             }
 
-            // Kombinera risker med vikt: fukt 70%, temp 30%
+            // 4. Kombinera risker med vikt: fukt 70%, temp 30%
             double moldRisk = humidityRisk * 0.7 + tempRisk * 0.3;
 
-            // Avrunda till 1 decimal
+            // 5. Avrunda till 1 decimal
             return Math.Round(moldRisk, 1);
         }
 
