@@ -150,10 +150,10 @@ namespace WeatherData
                 tempRisk = Math.Max(0, ((50 - temp) / (50 - 30)) * 100); // minskar linjärt mot 50°C
             }
 
-            // 4. Kombinera risker med vikt: fukt 70%, temp 30%
+            // Kombinera risker med vikt: fukt 70%, temp 30%
             double moldRisk = humidityRisk * 0.7 + tempRisk * 0.3;
 
-            // 5. Avrunda till 1 decimal
+            // Avrunda till 1 decimal
             return Math.Round(moldRisk, 1);
         }
 
